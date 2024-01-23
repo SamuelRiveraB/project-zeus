@@ -1,3 +1,4 @@
+import Button from "./Button";
 import Input from "./Input";
 
 const Login = () => {
@@ -10,6 +11,8 @@ const Login = () => {
         <Input name="email" type="email" />
         <Input name="password" type="password" />
         <Input name="password again" type="password" />
+        <Button text="Login" loading />
+        <Button text="Register" secondary />
       </div>
     </div>
   );
