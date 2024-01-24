@@ -1,6 +1,9 @@
 import React from "react";
 import Button from "./Button";
 import AddListBoard from "./AddListBoard";
+import Icon from "./Icon";
+import { BsFillChatFill } from "react-icons/bs";
+import { FiList } from "react-icons/fi";
 const logo = require("../Assets/logo.png");
 
 type Props = {};
@@ -13,7 +16,11 @@ function Header({}: Props) {
         src={logo}
         alt="logo"
       />
-      <AddListBoard />
+      <div className="flex flex-row-reverse md:flex-row items-center justify-center gap-5 flex-wrap">
+        <AddListBoard />
+        <Icon Name={BsFillChatFill} ping={true} />
+        <Icon Name={FiList} />
+      </div>
     </div>
   );
 }
