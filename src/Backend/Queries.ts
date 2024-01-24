@@ -1,6 +1,7 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signOut,
 } from "firebase/auth";
 import { auth, db } from "./Firebase";
 import { toastErr } from "../utils/toast";
@@ -14,7 +15,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { defaultUser, setUser } from "../Redux/userSlice";
+import { defaultUser, setUser, userStorageName } from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
 import convertTime from "../utils/convertTime";
@@ -97,7 +98,7 @@ const updateUserInfo = async ({
 };
 
 const getStorageUser = () => {
-  const usr = localStorage.getItem("zeus_user");
+  const usr = localStorage.getItem(userStorageName);
   if (usr) return JSON.parse(usr);
   else return null;
 };
@@ -161,4 +162,21 @@ export const BE_signIn = (
       CatchErr(err);
       setLoading(false);
     });
+};
+
+export const BE_signOut = (
+  dispatch: AppDispatch,
+  goTo: NavigateFunction,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  signOut(auth)
+    .then(async () => {
+      goTo("/auth");
+      await updateUserInfo({ isOffline: true });
+      dispatch(setUser(defaultUser));
+      localStorage.removeItem(userStorageName);
+      setLoading(false);
+    })
+    .catch((err) => CatchErr(err));
 };
