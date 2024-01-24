@@ -4,6 +4,7 @@ import AddListBoard from "./AddListBoard";
 import Icon from "./Icon";
 import { BsFillChatFill } from "react-icons/bs";
 import { FiList } from "react-icons/fi";
+import UserHeaderProfile from "./UserHeaderProfile";
 const logo = require("../Assets/logo.png");
 
 type Props = {};
@@ -20,6 +21,7 @@ function Header({}: Props) {
         <AddListBoard />
         <Icon Name={BsFillChatFill} ping={true} />
         <Icon Name={FiList} />
+        <UserHeaderProfile />
       </div>
     </div>
   );
