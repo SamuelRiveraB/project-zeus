@@ -1,23 +1,30 @@
 import { useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
-import { BE_signUp } from "../Backend/Queries";
+import { BE_signIn, BE_signUp } from "../Backend/Queries";
 
 const Login = () => {
   const [login, setLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPW, setConfirmPW] = useState("");
+  const [signupLoading, setSignupLoading] = useState(false);
 
   const handleSignup = () => {
     const data = { email, password, confirmPW };
-    BE_signUp(data);
+    BE_signUp(data, setSignupLoading, reset);
   };
 
   function handleSignin() {
     const data = { email, password };
-    console.log(data);
+    BE_signIn(data, setSignupLoading, reset);
   }
+
+  const reset = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPW("");
+  };
 
   return (
     <div className="w-full md:w-[450px]">
@@ -53,7 +60,11 @@ const Login = () => {
         )}
         {login ? (
           <>
-            <Button text="Login" onClick={handleSignin} />
+            <Button
+              text="Login"
+              onClick={handleSignin}
+              loading={signupLoading}
+            />
             <Button
               text="Register"
               secondary
@@ -64,7 +75,11 @@ const Login = () => {
           </>
         ) : (
           <>
-            <Button text="Register" onClick={handleSignup} />
+            <Button
+              text="Register"
+              onClick={handleSignup}
+              loading={signupLoading}
+            />
             <Button
               text="Login"
               secondary
