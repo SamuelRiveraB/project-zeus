@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "./Button";
 import Input from "./Input";
+import { BE_signUp } from "../Backend/Queries";
 
 const Login = () => {
   const [login, setLogin] = useState(true);
@@ -10,7 +11,7 @@ const Login = () => {
 
   const handleSignup = () => {
     const data = { email, password, confirmPW };
-    console.log(data);
+    BE_signUp(data);
   };
 
   function handleSignin() {
