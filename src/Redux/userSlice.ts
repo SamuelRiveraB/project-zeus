@@ -23,7 +23,9 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.currentUser = action.payload;
+      const user = action.payload;
+      localStorage.setItem("zeus_user", JSON.stringify(user));
+      state.currentUser = user;
     },
     setUsers: (state, action) => {},
   },

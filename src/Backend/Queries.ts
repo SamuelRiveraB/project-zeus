@@ -7,7 +7,13 @@ import { toastErr } from "../utils/toast";
 import CatchErr from "../utils/catchErr";
 import { authDataType, setLoadingType, userType } from "../Types";
 import { NavigateFunction } from "react-router-dom";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { defaultUser, setUser } from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
@@ -63,6 +69,39 @@ const getUserInfo = async (uid: string): Promise<userType> => {
   }
 };
 
+const updateUserInfo = async ({
+  id,
+  username,
+  img,
+  isOnline,
+  isOffline,
+}: {
+  id?: string;
+  username?: string;
+  img?: string;
+  isOnline?: boolean;
+  isOffline?: boolean;
+}) => {
+  if (!id) {
+    id = getStorageUser().id;
+  }
+  if (id) {
+    await updateDoc(doc(db, usersColl, id), {
+      ...(username && { username }),
+      ...(img && { img }),
+      ...(isOnline && { isOnline }),
+      ...(isOffline && { isOnline: false }),
+      lastSeen: serverTimestamp(),
+    });
+  }
+};
+
+const getStorageUser = () => {
+  const usr = localStorage.getItem("zeus_user");
+  if (usr) return JSON.parse(usr);
+  else return null;
+};
+
 export const BE_signUp = (
   data: authDataType,
   setLoading: setLoadingType,
@@ -111,6 +150,7 @@ export const BE_signIn = (
   setLoading(true);
   signInWithEmailAndPassword(auth, email, password)
     .then(async ({ user }) => {
+      await updateUserInfo({ id: user.uid, isOnline: true });
       const userInfo = await getUserInfo(user.uid);
       dispatch(setUser(userInfo));
       setLoading(false);
