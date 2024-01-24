@@ -12,13 +12,19 @@ export const defaultUser: userType = {
   bio: "",
 };
 
-const initialState = {};
+const initialState = {
+  // user: [],
+  currentUser: defaultUser,
+  // currentSelectedUser: null,
+};
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action) => {},
+    setUser: (state, action) => {
+      state.currentUser = action.payload;
+    },
     setUsers: (state, action) => {},
   },
 });

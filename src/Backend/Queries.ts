@@ -8,7 +8,8 @@ import CatchErr from "../utils/catchErr";
 import { authDataType, setLoadingType, userType } from "../Types";
 import { NavigateFunction } from "react-router-dom";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { defaultUser } from "../Redux/userSlice";
+import { defaultUser, setUser } from "../Redux/userSlice";
+import { AppDispatch } from "../Redux/store";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -60,20 +61,22 @@ export const BE_signUp = (
   data: authDataType,
   setLoading: setLoadingType,
   reset: () => void,
-  goTo: NavigateFunction
+  goTo: NavigateFunction,
+  dispatch: AppDispatch
 ) => {
   const { email, password, confirmPW } = data;
   setLoading(true);
   if (email && password && confirmPW) {
     if (password === confirmPW) {
       createUserWithEmailAndPassword(auth, email, password)
-        .then(({ user }) => {
-          const userInfo = addUserToCollection(
+        .then(async ({ user }) => {
+          const userInfo = await addUserToCollection(
             user.uid,
             user.email || "",
             user.email?.split("@")[0] || "",
             "imgLink"
           );
+          dispatch(setUser(userInfo));
           setLoading(false);
           reset();
           goTo("/dashboard");
@@ -96,13 +99,15 @@ export const BE_signIn = (
   data: authDataType,
   setLoading: setLoadingType,
   reset: () => void,
-  goTo: NavigateFunction
+  goTo: NavigateFunction,
+  dispatch: AppDispatch
 ) => {
   const { email, password } = data;
   setLoading(true);
   signInWithEmailAndPassword(auth, email, password)
-    .then(({ user }) => {
-      const userInfo = getUserInfo(user.uid);
+    .then(async ({ user }) => {
+      const userInfo = await getUserInfo(user.uid);
+      dispatch(setUser(userInfo));
       setLoading(false);
       reset();
       goTo("/dashboard");
