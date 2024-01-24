@@ -11,7 +11,9 @@ const CatchErr = (err: { code?: string }) => {
   else if (code === "auth/wrong-password") toastErr("Wrong password");
   else if (code === "auth/requires-recent-login")
     toastErr("Logout and Login before updating your profile");
-  else if (code === "auth/invalid-credential") toastErr("Invalid credentials");
+  else if (code === "auth/invalid-credencial") toastErr("Invalid credentials");
+  else if (code === "auth/invalid-login-credentials")
+    toastErr("Invalid login credentials");
   else toastErr("An error occured");
   console.log(err);
 };

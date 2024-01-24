@@ -10,6 +10,8 @@ import { NavigateFunction } from "react-router-dom";
 import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { defaultUser, setUser } from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
+import avatarGenerator from "../utils/avatarGenerator";
+import convertTime from "../utils/convertTime";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -47,8 +49,12 @@ const getUserInfo = async (uid: string): Promise<userType> => {
       img,
       username,
       email,
-      creationTime,
-      lastSeen,
+      creationTime: creationTime
+        ? convertTime(creationTime.toDate())
+        : "no date yet: userinfo",
+      lastSeen: lastSeen
+        ? convertTime(lastSeen.toDate())
+        : "no date yet: userinfo",
       bio,
     };
   } else {
@@ -70,11 +76,12 @@ export const BE_signUp = (
     if (password === confirmPW) {
       createUserWithEmailAndPassword(auth, email, password)
         .then(async ({ user }) => {
+          const imgLink = avatarGenerator(user.email?.split("@")[0]);
           const userInfo = await addUserToCollection(
             user.uid,
             user.email || "",
             user.email?.split("@")[0] || "",
-            "imgLink"
+            imgLink
           );
           dispatch(setUser(userInfo));
           setLoading(false);
@@ -86,12 +93,10 @@ export const BE_signUp = (
           setLoading(false);
         });
     } else {
-      toastErr("Passwords must match");
-      setLoading(false);
+      toastErr("Passwords must match", setLoading);
     }
   } else {
-    toastErr("Fields shouldn't be left empty!");
-    setLoading(false);
+    toastErr("Fields shouldn't be left empty!", setLoading);
   }
 };
 
