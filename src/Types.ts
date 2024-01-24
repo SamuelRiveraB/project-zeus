@@ -4,3 +4,14 @@ export type authDataType = {
   password: string;
   confirmPW?: string;
 };
+
+export type userType = {
+  id: string;
+  username: string;
+  email: string;
+  bio?: string;
+  isOnline: boolean;
+  img: string;
+  creationTime?: string;
+  lastSeen?: string;
+};

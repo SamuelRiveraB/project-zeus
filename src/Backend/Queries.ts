@@ -5,9 +5,10 @@ import {
 import { auth, db } from "./Firebase";
 import { toastErr } from "../utils/toast";
 import CatchErr from "../utils/catchErr";
-import { authDataType, setLoadingType } from "../Types";
+import { authDataType, setLoadingType, userType } from "../Types";
 import { NavigateFunction } from "react-router-dom";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { defaultUser } from "../Redux/userSlice";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -30,6 +31,29 @@ const addUserToCollection = async (
     lastSeen: serverTimestamp(),
     bio: `Hello, I'm ${username}`,
   });
+  return getUserInfo(uid);
+};
+
+const getUserInfo = async (uid: string): Promise<userType> => {
+  const userRef = doc(db, usersColl, uid);
+  const user = await getDoc(userRef);
+  if (user.exists()) {
+    const { isOnline, img, username, email, creationTime, lastSeen, bio } =
+      user.data();
+    return {
+      id: user.id,
+      isOnline,
+      img,
+      username,
+      email,
+      creationTime,
+      lastSeen,
+      bio,
+    };
+  } else {
+    toastErr("getUserInfo: User not found");
+    return defaultUser;
+  }
 };
 
 export const BE_signUp = (
@@ -44,7 +68,7 @@ export const BE_signUp = (
     if (password === confirmPW) {
       createUserWithEmailAndPassword(auth, email, password)
         .then(({ user }) => {
-          addUserToCollection(
+          const userInfo = addUserToCollection(
             user.uid,
             user.email || "",
             user.email?.split("@")[0] || "",
@@ -78,7 +102,7 @@ export const BE_signIn = (
   setLoading(true);
   signInWithEmailAndPassword(auth, email, password)
     .then(({ user }) => {
-      //   console.log(user);
+      const userInfo = getUserInfo(user.uid);
       setLoading(false);
       reset();
       goTo("/dashboard");
