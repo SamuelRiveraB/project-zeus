@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "./Button";
+import AddListBoard from "./AddListBoard";
 const logo = require("../Assets/logo.png");
 
 type Props = {};
@@ -12,7 +13,7 @@ function Header({}: Props) {
         src={logo}
         alt="logo"
       />
-      <Button text="Add New ListBoard" secondary />
+      <AddListBoard />
     </div>
   );
 }
