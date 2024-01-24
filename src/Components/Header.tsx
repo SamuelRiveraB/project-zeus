@@ -45,16 +45,38 @@ function Header({}: Props) {
         alt="logo"
       />
       <div className="flex flex-row-reverse md:flex-row items-center justify-center gap-5 flex-wrap">
-        <AddListBoard />
-        <Icon Name={BsFillChatFill} ping={true} />
-        <Icon Name={FiList} onClick={() => handleGoToPage("list")} />
+        {getCurrentPage() === "chat" ? (
+          <Icon Name={FiList} onClick={() => handleGoToPage("list")} />
+        ) : getCurrentPage() === "profile" ? (
+          <>
+            <Icon Name={FiList} onClick={() => handleGoToPage("list")} />
+            <Icon
+              Name={BsFillChatFill}
+              onClick={() => handleGoToPage("chat")}
+              ping={true}
+            />
+          </>
+        ) : (
+          <>
+            <AddListBoard />
+            <Icon
+              Name={BsFillChatFill}
+              onClick={() => handleGoToPage("chat")}
+              ping={true}
+            />
+          </>
+        )}
+
         <div className="group relative">
           <UserHeaderProfile user={currentUser} />
           <div className="absolute pt-5 hidden group-hover:block w-full min-w-max">
             <ul className="w-ful bg-white overflow-hidden rounded-md shadow-md text-gray-700 pt-1">
-              <Link to="profile" className="hover:bg-gray-200 py-2 px-4 block">
+              <li
+                onClick={() => handleGoToPage("profile")}
+                className="hover:bg-gray-200 py-2 px-4 block cursor-pointer"
+              >
                 Profile
-              </Link>
+              </li>
               <li
                 onClick={() => !logoutLoading && handleSignout()}
                 className={`hover:bg-gray-200 py-2 px-4 cursor-pointer flex items-center gap-4 ${
