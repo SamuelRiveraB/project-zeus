@@ -72,6 +72,18 @@ const taskListSlice = createSlice({
         return t;
       });
     },
+    collapseTask: (state, action) => {
+      const { listId, taskId } = action.payload;
+      const taskList = state.currentTaskList.find((t) => t.id === listId);
+      const listIdx = state.currentTaskList.findIndex((t) => t.id === listId);
+
+      taskList?.tasks?.map((t) => {
+        if (t.id === taskId) {
+          t.collapsed = !t.collapsed;
+        }
+      });
+      if (taskList) state.currentTaskList[listIdx] = taskList;
+    },
   },
 });
 
@@ -82,5 +94,6 @@ export const {
   taskListSwitchEditMode,
   deleteTaskList,
   addTask,
+  collapseTask,
 } = taskListSlice.actions;
 export default taskListSlice.reducer;
