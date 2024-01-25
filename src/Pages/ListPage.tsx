@@ -6,7 +6,12 @@ type Props = {};
 function ListPage({}: Props) {
   return (
     <div className="p-10">
-      <List />
+      <div className="flex flex-wrap justify-center gap-10">
+        <List />
+        <List />
+        <List />
+        <List />
+      </div>
     </div>
   );
 }

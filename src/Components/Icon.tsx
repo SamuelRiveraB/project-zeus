@@ -1,5 +1,6 @@
 import React from "react";
 import { IconType } from "react-icons";
+import Spinner from "./Spinner";
 
 type Props = {
   Name: IconType;
@@ -30,7 +31,7 @@ function Icon({
           : "bg-myBlue text-white border 2 hover:drop-shadow-lg"
       } ${loading && "cursor-wait"} ${className}`}
     >
-      {loading ? "Loading" : <Name size={size} />}
+      {loading ? <Spinner /> : <Name size={size} />}
       {ping && (
         <>
           <span className="animate-ping absolute -top-1 left-7 w-3 h-3 rounded-full bg-green-400 opacity-75"></span>
