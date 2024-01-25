@@ -3,6 +3,8 @@ import List from "../Components/List";
 import { BE_getTaskList } from "../Backend/Queries";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../Redux/store";
+import { ListLoaders } from "../Components/Loaders";
+import FlipMove from "react-flip-move";
 
 type Props = {};
 
@@ -16,13 +18,20 @@ function ListPage({}: Props) {
   useEffect(() => {
     BE_getTaskList(dispatch, setLoading);
   }, []);
+
   return (
     <div className="p-10">
-      <div className="flex flex-wrap justify-center gap-10">
-        {taskList.map((t) => (
-          <List list={t} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex flex-wrap justify-center gap-20">
+          <ListLoaders />
+        </div>
+      ) : (
+        <FlipMove className="flex flex-wrap justify-center gap-10">
+          {taskList.map((t) => (
+            <List key={t.id} list={t} />
+          ))}
+        </FlipMove>
+      )}
     </div>
   );
 }
