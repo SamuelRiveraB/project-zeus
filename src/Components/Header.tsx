@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "./Button";
 import AddListBoard from "./AddListBoard";
 import Icon from "./Icon";
@@ -7,7 +7,7 @@ import { FiList } from "react-icons/fi";
 import UserHeaderProfile from "./UserHeaderProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
-import { Link, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BE_signOut } from "../Backend/Queries";
 import Spinner from "./Spinner";
 const logo = require("../Assets/logo.png");
@@ -19,6 +19,14 @@ function Header({}: Props) {
   const goTo = useNavigate();
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!currentUser?.id) goTo("/auth");
+    else {
+      goTo(`${location.pathname}`);
+    }
+  }, []);
 
   const handleSignout = () => {
     BE_signOut(dispatch, goTo, setLogoutLoading);
@@ -46,10 +54,10 @@ function Header({}: Props) {
       />
       <div className="flex flex-row-reverse md:flex-row items-center justify-center gap-5 flex-wrap">
         {getCurrentPage() === "chat" ? (
-          <Icon Name={FiList} onClick={() => handleGoToPage("list")} />
+          <Icon Name={FiList} onClick={() => handleGoToPage("")} />
         ) : getCurrentPage() === "profile" ? (
           <>
-            <Icon Name={FiList} onClick={() => handleGoToPage("list")} />
+            <Icon Name={FiList} onClick={() => handleGoToPage("")} />
             <Icon
               Name={BsFillChatFill}
               onClick={() => handleGoToPage("chat")}
