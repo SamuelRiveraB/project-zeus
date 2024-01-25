@@ -1,9 +1,14 @@
 import React from "react";
+import List from "../Components/List";
 
 type Props = {};
 
 function ListPage({}: Props) {
-  return <div>ListPage</div>;
+  return (
+    <div className="p-10">
+      <List />
+    </div>
+  );
 }
 
 export default ListPage;
