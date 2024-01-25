@@ -39,6 +39,8 @@ import {
   deleteTaskList,
   defaultTask,
   addTask,
+  saveTask,
+  setTasks,
 } from "../Redux/taskListSlice";
 
 const usersColl = "users";
@@ -331,4 +333,48 @@ export const BE_addTask = async (
     toastErr("BE_addTask: No such document");
     setLoading(false);
   }
+};
+
+export const BE_saveTask = async (
+  listId: string,
+  dispatch: AppDispatch,
+  setLoading: setLoadingType,
+  data: taskType
+) => {
+  setLoading(true);
+  const { id } = data;
+  if (id) {
+    const taskRef = doc(db, taskListColl, listId, tasksColl, id);
+    await updateDoc(taskRef, data);
+    const updatedTask = await getDoc(taskRef);
+    if (updatedTask.exists()) {
+      setLoading(false);
+      dispatch(saveTask({ listId, ...updatedTask.data() }));
+    } else toastErr("BE_saveTask: updated task not found");
+  } else toastErr("BE_saveTask: id not found");
+};
+
+export const getAllTasks = async (
+  listId: string,
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const taskRef = collection(db, taskListColl, listId, tasksColl);
+  const tasksSnap = await getDocs(taskRef);
+  const tasks: taskType[] = [];
+  if (!tasksSnap.empty) {
+    tasksSnap.forEach((task) => {
+      const { title, description } = task.data();
+      tasks.push({
+        id: task.id,
+        title,
+        description,
+        editMode: false,
+        collapsed: true,
+      });
+    });
+  }
+  dispatch(setTasks({ listId, tasks }));
+  setLoading(false);
 };

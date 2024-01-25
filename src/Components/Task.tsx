@@ -4,7 +4,8 @@ import { MdDelete, MdEdit, MdSave } from "react-icons/md";
 import { taskType } from "../Types";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../Redux/store";
-import { collapseTask } from "../Redux/taskListSlice";
+import { collapseTask, taskSwitchEditMode } from "../Redux/taskListSlice";
+import { BE_saveTask } from "../Backend/Queries";
 
 type Props = {
   task: taskType;
@@ -16,7 +17,17 @@ const Task = forwardRef(
     const { id, title, description, editMode, collapsed } = task;
     const [taskTitle, setTaskTitle] = useState(title);
     const [taskDesc, setTaskDesc] = useState(description);
+    const [saveloading, setSaveLoading] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
+
+    const handleSave = () => {
+      const taskData: taskType = {
+        id,
+        title: taskTitle,
+        description: taskDesc,
+      };
+      BE_saveTask(listId, dispatch, setSaveLoading, taskData);
+    };
 
     return (
       <div
@@ -33,7 +44,7 @@ const Task = forwardRef(
             ></input>
           ) : (
             <p
-              onClick={() => dispatch(collapseTask({ listId, taskId: id }))}
+              onClick={() => dispatch(collapseTask({ listId, id }))}
               className="cursor-pointer"
             >
               {title}
@@ -55,7 +66,16 @@ const Task = forwardRef(
                 <p className="p-2 text-justify">{description}</p>
               )}
               <div className="flex justify-end">
-                <Icon Name={editMode ? MdSave : MdEdit} reduceOpacityOnHover />
+                <Icon
+                  onClick={() =>
+                    editMode
+                      ? handleSave()
+                      : dispatch(taskSwitchEditMode({ listId, id }))
+                  }
+                  Name={editMode ? MdSave : MdEdit}
+                  loading={saveloading}
+                  reduceOpacityOnHover
+                />
                 <Icon Name={MdDelete} reduceOpacityOnHover />
               </div>
             </div>

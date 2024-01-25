@@ -73,16 +73,57 @@ const taskListSlice = createSlice({
       });
     },
     collapseTask: (state, action) => {
-      const { listId, taskId } = action.payload;
+      const { listId, id } = action.payload;
       const taskList = state.currentTaskList.find((t) => t.id === listId);
       const listIdx = state.currentTaskList.findIndex((t) => t.id === listId);
 
       taskList?.tasks?.map((t) => {
-        if (t.id === taskId) {
+        if (t.id === id) {
           t.collapsed = !t.collapsed;
         }
       });
       if (taskList) state.currentTaskList[listIdx] = taskList;
+    },
+    taskSwitchEditMode: (state, action) => {
+      const { listId, id, value } = action.payload;
+      state.currentTaskList = state.currentTaskList.map((t) => {
+        if (t.id === listId) {
+          const updatedT = t.tasks?.map((t) => {
+            if (t.id === id) {
+              t.editMode = value !== undefined ? value : true;
+            }
+            return t;
+          });
+          t.tasks = updatedT;
+        }
+        return t;
+      });
+    },
+    saveTask: (state, action) => {
+      const { listId, id, title, description } = action.payload;
+      const updatedTaskList = state.currentTaskList.map((t) => {
+        if (t.id === listId) {
+          const updatedTask = t.tasks?.map((t) => {
+            if (t.id === id) {
+              t = { ...t, title, description, editMode: false };
+            }
+            return t;
+          });
+          t.tasks = updatedTask;
+        }
+        return t;
+      });
+      state.currentTaskList = updatedTaskList;
+    },
+    setTasks: (state, action) => {
+      const { listId, tasks } = action.payload;
+      const taskList = state.currentTaskList.map((t) => {
+        if (t.id === listId) {
+          t.tasks = tasks;
+        }
+        return t;
+      });
+      state.currentTaskList = taskList;
     },
   },
 });
@@ -95,5 +136,8 @@ export const {
   deleteTaskList,
   addTask,
   collapseTask,
+  taskSwitchEditMode,
+  saveTask,
+  setTasks,
 } = taskListSlice.actions;
 export default taskListSlice.reducer;
