@@ -11,7 +11,7 @@ import Tasks from "./Tasks";
 import { taskListType } from "../Types";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../Redux/store";
-import { BE_saveTaskList } from "../Backend/Queries";
+import { BE_deleteTaskList, BE_saveTaskList } from "../Backend/Queries";
 import { taskListSwitchEditMode } from "../Redux/taskListSlice";
 
 type Props = {
@@ -23,6 +23,7 @@ const List = forwardRef(
     const { id, title, editMode, tasks } = list;
     const [homeTitle, setHomeTitle] = useState(title);
     const [saveLoading, setSaveLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
 
     const handleSave = () => {
@@ -33,6 +34,10 @@ const List = forwardRef(
       if (e.key === "Enter") {
         handleSave();
       }
+    };
+
+    const handleDelete = () => {
+      if (id && tasks) BE_deleteTaskList(dispatch, setDeleteLoading, id, tasks);
     };
 
     return (
@@ -61,7 +66,12 @@ const List = forwardRef(
                 reduceOpacityOnHover
                 loading={editMode && saveLoading}
               />
-              <Icon Name={MdDelete} reduceOpacityOnHover />
+              <Icon
+                onClick={handleDelete}
+                Name={MdDelete}
+                loading={deleteLoading}
+                reduceOpacityOnHover
+              />
               <Icon Name={MdKeyboardArrowDown} reduceOpacityOnHover />
             </div>
           </div>

@@ -6,11 +6,18 @@ import {
 import { auth, db } from "./Firebase";
 import { toastErr } from "../utils/toast";
 import CatchErr from "../utils/catchErr";
-import { authDataType, setLoadingType, taskListType, userType } from "../Types";
+import {
+  authDataType,
+  setLoadingType,
+  taskListType,
+  taskType,
+  userType,
+} from "../Types";
 import { NavigateFunction } from "react-router-dom";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -29,6 +36,7 @@ import {
   defaultTaskList,
   setTaskList,
   saveTaskListTitle,
+  deleteTaskList,
 } from "../Redux/taskListSlice";
 
 const usersColl = "users";
@@ -241,6 +249,38 @@ export const BE_saveTaskList = async (
   dispatch(
     saveTaskListTitle({ id: updatedTaskList.id, ...updatedTaskList.data() })
   );
+};
+
+export const BE_deleteTaskList = async (
+  dispatch: AppDispatch,
+  setLoading: setLoadingType,
+  listId: string,
+  tasks: taskType[]
+) => {
+  setLoading(true);
+  if (tasks.length > 0) {
+    for (let i = 0; i < tasks.length; i++) {
+      const { id } = tasks[i];
+      if (id) BE_deleteTask(listId, id, dispatch);
+    }
+  }
+  const listRef = doc(db, taskListColl, listId);
+  await deleteDoc(listRef);
+  const deletedList = await getDoc(listRef);
+  if (!deletedList.exists()) {
+    setLoading(false);
+    dispatch(deleteTaskList(listId));
+  }
+};
+
+export const BE_deleteTask = async (
+  listId: string,
+  id: string,
+  dispatch: AppDispatch
+) => {
+  const taskRef = doc(db, taskListColl, listId, tasksColl, id);
+  await deleteDoc(taskRef);
+  const deletedTask = await getDoc(taskRef);
 };
 
 const getAllTaskList = async () => {
