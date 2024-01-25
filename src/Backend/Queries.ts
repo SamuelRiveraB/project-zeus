@@ -6,9 +6,11 @@ import {
 import { auth, db } from "./Firebase";
 import { toastErr } from "../utils/toast";
 import CatchErr from "../utils/catchErr";
-import { authDataType, setLoadingType, userType } from "../Types";
+import { authDataType, setLoadingType, taskListType, userType } from "../Types";
 import { NavigateFunction } from "react-router-dom";
 import {
+  addDoc,
+  collection,
   doc,
   getDoc,
   serverTimestamp,
@@ -19,6 +21,7 @@ import { defaultUser, setUser, userStorageName } from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
 import convertTime from "../utils/convertTime";
+import { addTaskList, defaultTaskList } from "../Redux/taskListSlice";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -179,4 +182,30 @@ export const BE_signOut = (
       setLoading(false);
     })
     .catch((err) => CatchErr(err));
+};
+
+// Task list
+
+export const BE_addTaskList = async (
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const { title } = defaultTaskList;
+  const list = await addDoc(collection(db, taskListColl), {
+    title,
+    userId: getStorageUser().id,
+  });
+  const docSnap = await getDoc(doc(db, list.path));
+  if (docSnap.exists()) {
+    const newDoc: taskListType = {
+      id: docSnap.id,
+      title: docSnap.data().title,
+    };
+    dispatch(addTaskList(newDoc));
+    setLoading(false);
+  } else {
+    toastErr("BE_addTaskList: No such doc");
+    setLoading(false);
+  }
 };
