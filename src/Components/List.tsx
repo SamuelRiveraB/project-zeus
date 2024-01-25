@@ -18,6 +18,7 @@ import {
   BE_saveTaskList,
 } from "../Backend/Queries";
 import { taskListSwitchEditMode } from "../Redux/taskListSlice";
+import { TaskLoader } from "./Loaders";
 
 type Props = {
   list: taskListType;
@@ -90,7 +91,11 @@ const List = forwardRef(
               <Icon Name={MdKeyboardArrowDown} reduceOpacityOnHover />
             </div>
           </div>
-          <Tasks tasks={tasks || []} listId={id || ""} />
+          {getLoading ? (
+            <TaskLoader />
+          ) : (
+            <Tasks tasks={tasks || []} listId={id || ""} />
+          )}
         </div>
         <Icon
           onClick={handleAddTask}

@@ -5,7 +5,7 @@ import { taskType } from "../Types";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../Redux/store";
 import { collapseTask, taskSwitchEditMode } from "../Redux/taskListSlice";
-import { BE_saveTask } from "../Backend/Queries";
+import { BE_deleteTask, BE_saveTask } from "../Backend/Queries";
 
 type Props = {
   task: taskType;
@@ -18,6 +18,7 @@ const Task = forwardRef(
     const [taskTitle, setTaskTitle] = useState(title);
     const [taskDesc, setTaskDesc] = useState(description);
     const [saveloading, setSaveLoading] = useState(false);
+    const [delLoading, setDelLoading] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
 
     const handleSave = () => {
@@ -27,6 +28,10 @@ const Task = forwardRef(
         description: taskDesc,
       };
       BE_saveTask(listId, dispatch, setSaveLoading, taskData);
+    };
+
+    const handleDelete = () => {
+      if (id) BE_deleteTask(listId, id, dispatch, setDelLoading);
     };
 
     return (
@@ -74,9 +79,16 @@ const Task = forwardRef(
                   }
                   Name={editMode ? MdSave : MdEdit}
                   loading={saveloading}
+                  size={16}
                   reduceOpacityOnHover
                 />
-                <Icon Name={MdDelete} reduceOpacityOnHover />
+                <Icon
+                  onClick={handleDelete}
+                  Name={MdDelete}
+                  reduceOpacityOnHover
+                  loading={delLoading}
+                  size={16}
+                />
               </div>
             </div>
           </div>

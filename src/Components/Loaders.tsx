@@ -23,3 +23,13 @@ function ListLoader() {
     </div>
   );
 }
+
+export const TaskLoader = () => {
+  return (
+    <div className="animate-pulse flex-1 space-y-3 p-4 pb-10">
+      <div className="h-2 bg-gray-300 rounded-md"></div>
+      <div className="h-2 bg-gray-300 rounded-md"></div>
+      <div className="h-2 bg-gray-300 rounded-md"></div>
+    </div>
+  );
+};

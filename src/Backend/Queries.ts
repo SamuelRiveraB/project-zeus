@@ -41,6 +41,7 @@ import {
   addTask,
   saveTask,
   setTasks,
+  deleteTask,
 } from "../Redux/taskListSlice";
 
 const usersColl = "users";
@@ -304,9 +305,14 @@ export const BE_deleteTask = async (
   dispatch: AppDispatch,
   setLoading?: setLoadingType
 ) => {
+  if (setLoading) setLoading(true);
   const taskRef = doc(db, taskListColl, listId, tasksColl, id);
   await deleteDoc(taskRef);
   const deletedTask = await getDoc(taskRef);
+  if (!deletedTask.exists()) {
+    if (setLoading) setLoading(false);
+    dispatch(deleteTask({ listId, id }));
+  }
 };
 
 export const BE_addTask = async (
