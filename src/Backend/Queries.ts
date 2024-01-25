@@ -37,6 +37,8 @@ import {
   setTaskList,
   saveTaskListTitle,
   deleteTaskList,
+  defaultTask,
+  addTask,
 } from "../Redux/taskListSlice";
 
 const usersColl = "users";
@@ -273,16 +275,6 @@ export const BE_deleteTaskList = async (
   }
 };
 
-export const BE_deleteTask = async (
-  listId: string,
-  id: string,
-  dispatch: AppDispatch
-) => {
-  const taskRef = doc(db, taskListColl, listId, tasksColl, id);
-  await deleteDoc(taskRef);
-  const deletedTask = await getDoc(taskRef);
-};
-
 const getAllTaskList = async () => {
   const q = query(
     collection(db, taskListColl),
@@ -300,4 +292,43 @@ const getAllTaskList = async () => {
     });
   });
   return taskList;
+};
+
+// Tasks
+
+export const BE_deleteTask = async (
+  listId: string,
+  id: string,
+  dispatch: AppDispatch,
+  setLoading?: setLoadingType
+) => {
+  const taskRef = doc(db, taskListColl, listId, tasksColl, id);
+  await deleteDoc(taskRef);
+  const deletedTask = await getDoc(taskRef);
+};
+
+export const BE_addTask = async (
+  listId: string,
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const task = await addDoc(collection(db, taskListColl, listId, tasksColl), {
+    ...defaultTask,
+  });
+
+  const newTaskSnap = await getDoc(doc(db, task.path));
+  if (newTaskSnap.exists()) {
+    const { title, description } = newTaskSnap.data();
+    const newTask: taskType = {
+      id: newTaskSnap.id,
+      title,
+      description,
+    };
+    dispatch(addTask({ listId, newTask }));
+    setLoading(false);
+  } else {
+    toastErr("BE_addTask: No such document");
+    setLoading(false);
+  }
 };
