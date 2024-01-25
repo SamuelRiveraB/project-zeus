@@ -27,6 +27,7 @@ function AddListBoard({}: Props) {
       />
       <Icon
         Name={MdAdd}
+        onClick={handleAddTaskList}
         className="block md:hidden"
         loading={addLoading}
       ></Icon>

@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import List from "../Components/List";
 import { BE_getTaskList } from "../Backend/Queries";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../Redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../Redux/store";
 
 type Props = {};
 
 function ListPage({}: Props) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const taskList = useSelector(
+    (state: RootState) => state.taskList.currentTaskList
+  );
 
   useEffect(() => {
     BE_getTaskList(dispatch, setLoading);
@@ -16,10 +19,9 @@ function ListPage({}: Props) {
   return (
     <div className="p-10">
       <div className="flex flex-wrap justify-center gap-10">
-        <List />
-        <List />
-        <List />
-        <List />
+        {taskList.map((t) => (
+          <List list={t} />
+        ))}
       </div>
     </div>
   );
