@@ -25,6 +25,10 @@ function ListPage({}: Props) {
         <div className="flex flex-wrap justify-center gap-20">
           <ListLoaders />
         </div>
+      ) : taskList.length === 0 ? (
+        <h1 className="text-3xl text-center text-gray-500 mt-10">
+          No task list added
+        </h1>
       ) : (
         <FlipMove className="flex flex-wrap justify-center gap-10">
           {taskList.map((t) => (
