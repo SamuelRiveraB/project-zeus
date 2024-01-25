@@ -28,6 +28,7 @@ import {
   addTaskList,
   defaultTaskList,
   setTaskList,
+  saveTaskListTitle,
 } from "../Redux/taskListSlice";
 
 const usersColl = "users";
@@ -225,6 +226,21 @@ export const BE_getTaskList = async (
   const taskList = await getAllTaskList();
   dispatch(setTaskList(taskList));
   setLoading(false);
+};
+
+export const BE_saveTaskList = async (
+  dispatch: AppDispatch,
+  setLoading: setLoadingType,
+  listId: string,
+  title: string
+) => {
+  setLoading(true);
+  await updateDoc(doc(db, taskListColl, listId), { title });
+  const updatedTaskList = await getDoc(doc(db, taskListColl, listId));
+  setLoading(false);
+  dispatch(
+    saveTaskListTitle({ id: updatedTaskList.id, ...updatedTaskList.data() })
+  );
 };
 
 const getAllTaskList = async () => {

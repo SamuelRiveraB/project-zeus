@@ -9,6 +9,10 @@ import {
 } from "react-icons/md";
 import Tasks from "./Tasks";
 import { taskListType } from "../Types";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../Redux/store";
+import { BE_saveTaskList } from "../Backend/Queries";
+import { taskListSwitchEditMode } from "../Redux/taskListSlice";
 
 type Props = {
   list: taskListType;
@@ -18,6 +22,18 @@ const List = forwardRef(
   ({ list }: Props, ref: React.LegacyRef<HTMLDivElement> | undefined) => {
     const { id, title, editMode, tasks } = list;
     const [homeTitle, setHomeTitle] = useState(title);
+    const [saveLoading, setSaveLoading] = useState(false);
+    const dispatch = useDispatch<AppDispatch>();
+
+    const handleSave = () => {
+      if (id) BE_saveTaskList(dispatch, setSaveLoading, id, homeTitle);
+    };
+
+    const checkEnterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        handleSave();
+      }
+    };
 
     return (
       <div ref={ref} className="relative">
@@ -26,6 +42,7 @@ const List = forwardRef(
             {editMode ? (
               <input
                 value={homeTitle}
+                onKeyDown={checkEnterKey}
                 onChange={(e) => setHomeTitle(e.target.value)}
                 className="flex-1 bg-transparent placeholder-gray-300 px-3 py-1 border-[1px] border-white rounded-md"
                 placeholder="Enter Task list title"
@@ -34,7 +51,16 @@ const List = forwardRef(
               <p>{title}</p>
             )}
             <div>
-              <Icon Name={editMode ? MdSave : MdEdit} reduceOpacityOnHover />
+              <Icon
+                Name={editMode ? MdSave : MdEdit}
+                onClick={() =>
+                  editMode
+                    ? handleSave()
+                    : dispatch(taskListSwitchEditMode({ id }))
+                }
+                reduceOpacityOnHover
+                loading={editMode && saveLoading}
+              />
               <Icon Name={MdDelete} reduceOpacityOnHover />
               <Icon Name={MdKeyboardArrowDown} reduceOpacityOnHover />
             </div>

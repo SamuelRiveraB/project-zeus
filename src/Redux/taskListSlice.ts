@@ -31,8 +31,32 @@ const taskListSlice = createSlice({
       newTaskList.tasks = [];
       state.currentTaskList.unshift(newTaskList);
     },
+    saveTaskListTitle: (state, action) => {
+      const { id, title } = action.payload;
+      state.currentTaskList = state.currentTaskList.map((t) => {
+        if (t.id === id) {
+          t.title = title;
+          t.editMode = false;
+        }
+        return t;
+      });
+    },
+    taskListSwitchEditMode: (state, action) => {
+      const { id, value } = action.payload;
+      state.currentTaskList = state.currentTaskList.map((t) => {
+        if (t.id === id) {
+          t.editMode = value !== undefined ? value : true;
+        }
+        return t;
+      });
+    },
   },
 });
 
-export const { setTaskList, addTaskList } = taskListSlice.actions;
+export const {
+  setTaskList,
+  addTaskList,
+  saveTaskListTitle,
+  taskListSwitchEditMode,
+} = taskListSlice.actions;
 export default taskListSlice.reducer;
