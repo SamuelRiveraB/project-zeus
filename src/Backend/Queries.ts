@@ -13,15 +13,22 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { defaultUser, setUser, userStorageName } from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
 import convertTime from "../utils/convertTime";
-import { addTaskList, defaultTaskList } from "../Redux/taskListSlice";
+import {
+  addTaskList,
+  defaultTaskList,
+  setTaskList,
+} from "../Redux/taskListSlice";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -208,4 +215,33 @@ export const BE_addTaskList = async (
     toastErr("BE_addTaskList: No such doc");
     setLoading(false);
   }
+};
+
+export const BE_getTaskList = async (
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const taskList = await getAllTaskList();
+  dispatch(setTaskList(taskList));
+  setLoading(false);
+};
+
+const getAllTaskList = async () => {
+  const q = query(
+    collection(db, taskListColl),
+    where("userId", "==", getStorageUser().id)
+  );
+  const taskListSnapshot = await getDocs(q);
+  const taskList: taskListType[] = [];
+  taskListSnapshot.forEach((doc) => {
+    const { title } = doc.data();
+    taskList.push({
+      id: doc.id,
+      title,
+      editMode: false,
+      tasks: [],
+    });
+  });
+  return taskList;
 };
