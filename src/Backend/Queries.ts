@@ -210,8 +210,8 @@ export const BE_getAllUsers = async (
         username,
         email,
         bio,
-        creationTime: convertTime(creationTime.toDate),
-        lastSeen: convertTime(lastSeen.toDate),
+        creationTime: convertTime(creationTime.toDate()),
+        lastSeen: convertTime(lastSeen.toDate()),
       });
     });
     const id = getStorageUser().id;
