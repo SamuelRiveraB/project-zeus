@@ -62,7 +62,7 @@ const List = forwardRef(
     };
 
     const handleDelete = () => {
-      if (id && tasks) BE_deleteTaskList(dispatch, setDeleteLoading, id, tasks);
+      if (id && tasks) BE_deleteTaskList(id, tasks, dispatch, setDeleteLoading);
     };
 
     const handleAddTask = () => {

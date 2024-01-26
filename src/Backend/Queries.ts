@@ -1,5 +1,6 @@
 import {
   createUserWithEmailAndPassword,
+  deleteUser,
   signInWithEmailAndPassword,
   signOut,
   updateEmail,
@@ -159,6 +160,31 @@ export const BE_saveProfile = async (
   } else toastErr("BE_saveProfile: id not found");
 };
 
+export const BE_deleteAccount = async (
+  dispatch: AppDispatch,
+  goTo: NavigateFunction,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const userTaskList = await getAllTaskList();
+  if (userTaskList.length > 0) {
+    userTaskList.forEach((t) => {
+      if (t.id && t.tasks) BE_deleteTaskList(t.id, t.tasks, dispatch);
+    });
+  }
+
+  await deleteDoc(doc(db, usersColl, getStorageUser().id));
+  const user = auth.currentUser;
+  if (user) {
+    deleteUser(user)
+      .then(async () => {
+        BE_signOut(dispatch, goTo, setLoading, true);
+        setLoading(false);
+      })
+      .catch((err) => CatchErr(err));
+  }
+};
+
 export const getStorageUser = () => {
   const usr = localStorage.getItem(userStorageName);
   if (usr) return JSON.parse(usr);
@@ -229,12 +255,13 @@ export const BE_signIn = (
 export const BE_signOut = (
   dispatch: AppDispatch,
   goTo: NavigateFunction,
-  setLoading: setLoadingType
+  setLoading: setLoadingType,
+  deleteAcc?: boolean
 ) => {
   setLoading(true);
   signOut(auth)
     .then(async () => {
-      await updateUserInfo({ isOffline: true });
+      if (!deleteAcc) await updateUserInfo({ isOffline: true });
       dispatch(setUser(defaultUser));
       localStorage.removeItem(userStorageName);
       goTo("/auth");
@@ -295,12 +322,12 @@ export const BE_saveTaskList = async (
 };
 
 export const BE_deleteTaskList = async (
-  dispatch: AppDispatch,
-  setLoading: setLoadingType,
   listId: string,
-  tasks: taskType[]
+  tasks: taskType[],
+  dispatch: AppDispatch,
+  setLoading?: setLoadingType
 ) => {
-  setLoading(true);
+  if (setLoading) setLoading(true);
   if (tasks.length > 0) {
     for (let i = 0; i < tasks.length; i++) {
       const { id } = tasks[i];
@@ -311,7 +338,7 @@ export const BE_deleteTaskList = async (
   await deleteDoc(listRef);
   const deletedList = await getDoc(listRef);
   if (!deletedList.exists()) {
-    setLoading(false);
+    if (setLoading) setLoading(false);
     dispatch(deleteTaskList(listId));
   }
 };
