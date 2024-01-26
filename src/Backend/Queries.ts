@@ -196,10 +196,10 @@ export const BE_signOut = (
   setLoading(true);
   signOut(auth)
     .then(async () => {
-      goTo("/auth");
       await updateUserInfo({ isOffline: true });
       dispatch(setUser(defaultUser));
       localStorage.removeItem(userStorageName);
+      goTo("/auth");
       setLoading(false);
     })
     .catch((err) => CatchErr(err));

@@ -17,7 +17,7 @@ import {
   getAllTasks,
   BE_saveTaskList,
 } from "../Backend/Queries";
-import { taskListSwitchEditMode } from "../Redux/taskListSlice";
+import { collapseAll, taskListSwitchEditMode } from "../Redux/taskListSlice";
 import { TaskLoader } from "./Loaders";
 
 type Props = {
@@ -26,17 +26,30 @@ type Props = {
 
 const List = forwardRef(
   ({ list }: Props, ref: React.LegacyRef<HTMLDivElement> | undefined) => {
-    const { id, title, editMode, tasks } = list;
+    const { id, title, editMode, tasks = [] } = list;
     const [homeTitle, setHomeTitle] = useState(title);
     const [saveLoading, setSaveLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
     const [addLoading, setAddLoading] = useState(false);
     const [getLoading, setGetLoading] = useState(false);
+    const [allCollapsed, setAllCollapsed] = useState(false);
+
     const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
       if (id) getAllTasks(id, dispatch, setGetLoading);
     }, []);
+
+    useEffect(() => {
+      const checkAllCollapsed = () => {
+        for (let i = 0; i < tasks.length; i++) {
+          const task = tasks[i];
+          if (!task.collapsed) return setAllCollapsed(false);
+        }
+        return setAllCollapsed(true);
+      };
+      checkAllCollapsed();
+    }, [tasks]);
 
     const handleSave = () => {
       if (id) BE_saveTaskList(dispatch, setSaveLoading, id, homeTitle);
@@ -54,6 +67,13 @@ const List = forwardRef(
 
     const handleAddTask = () => {
       if (id) BE_addTask(id, dispatch, setAddLoading);
+    };
+
+    const handleCollapseClick = () => {
+      if (allCollapsed) {
+        return dispatch(collapseAll({ listId: id, value: false }));
+      }
+      return dispatch(collapseAll({ listId: id }));
     };
 
     return (
@@ -88,7 +108,12 @@ const List = forwardRef(
                 loading={deleteLoading}
                 reduceOpacityOnHover
               />
-              <Icon Name={MdKeyboardArrowDown} reduceOpacityOnHover />
+              <Icon
+                onClick={handleCollapseClick}
+                Name={MdKeyboardArrowDown}
+                className={`${allCollapsed ? "rotate-180" : "rotate-0"}`}
+                reduceOpacityOnHover
+              />
             </div>
           </div>
           {getLoading ? (
