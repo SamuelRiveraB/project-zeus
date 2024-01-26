@@ -9,8 +9,12 @@ const chatsSlice = createSlice({
     setIsChatsTab: (state, action) => {
       state.isChatsTab = action.payload;
     },
+    setChats: (state, action) => {
+      const chats = action.payload;
+      state.chats = chats;
+    },
   },
 });
 
-export const { setIsChatsTab } = chatsSlice.actions;
+export const { setIsChatsTab, setChats } = chatsSlice.actions;
 export default chatsSlice.reducer;
