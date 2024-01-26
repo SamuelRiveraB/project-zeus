@@ -21,7 +21,7 @@ const Login = () => {
   useEffect(() => {
     if (usr?.id) {
       dispatch(setUser(usr));
-      goTo("/dashboard/profile");
+      goTo("/dashboard/chat");
     }
   }, []);
 
