@@ -4,6 +4,8 @@ import Button from "../Components/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
+import { toastErr, toastWarn } from "../utils/toast";
+import { BE_saveProfile } from "../Backend/Queries";
 
 function ProfilePage() {
   const [email, setEmail] = useState("");
@@ -11,6 +13,9 @@ function ProfilePage() {
   const [password, setPassword] = useState("");
   const [confirmPW, setConfirmPW] = useState("");
   const [avatar, setAvatar] = useState("");
+
+  const [saveProfileLoading, setSaveProfileLoading] = useState(false);
+  const [deleteAccLoading, setDeleteAccLoading] = useState(false);
 
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
   const dispatch = useDispatch<AppDispatch>();
@@ -24,6 +29,38 @@ function ProfilePage() {
     setAvatar(avatarGenerator());
   };
 
+  const handleSaveProfile = async () => {
+    if (!email || !username) toastErr("Email or username can't be empty!");
+
+    let temp_pw = password;
+    if (temp_pw && temp_pw !== confirmPW) {
+      toastErr("Passwords must match!");
+      temp_pw = "";
+    }
+
+    let temp_email = email;
+    if (temp_email === currentUser.email) temp_email = "";
+
+    let temp_user = username;
+    if (temp_user === currentUser.username) temp_user = "";
+
+    let temp_avatar = avatar;
+    if (temp_avatar === currentUser.img) temp_avatar = "";
+
+    if (temp_email || temp_user || temp_pw || temp_avatar) {
+      await BE_saveProfile(
+        dispatch,
+        {
+          email: temp_email,
+          username: temp_user,
+          password: temp_pw,
+          img: temp_avatar,
+        },
+        setSaveProfileLoading
+      );
+    } else toastWarn("Nothing to update");
+  };
+
   return (
     <div className="bg-white flex flex-col gap-5 shadow-md max-w-2xl rounded-xl py-5 px-6 md:p-10 md:m-auto m-5 md:mt-10">
       <div className="relative self-center" onClick={handleAvatarGenerate}>
@@ -35,7 +72,8 @@ function ProfilePage() {
         <span className="absolute top-7 md:top-6 left-28 md:left-40 w-5 h-5 border-2 border-gray-800 rounded-full bg-green-400"></span>
       </div>
       <p className="text-gray-400 text-sm text-center">
-        Note: Click on image to temporary change it
+        Note: Click on image to temporary change it, then save profile. You can
+        leav password and username as they are if you don't want to change them
       </p>
       <div className="flex flex-col gap-2">
         <Input
@@ -51,14 +89,18 @@ function ProfilePage() {
         <Input
           name="password"
           type="password"
-          onChange={(e) => setPassword(e.target.value())}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <Input
           name="confirmPW"
           type="password"
-          onChange={(e) => setConfirmPW(e.target.value())}
+          onChange={(e) => setConfirmPW(e.target.value)}
         />
-        <Button text="Update Profile" />
+        <Button
+          text="Update Profile"
+          onClick={handleSaveProfile}
+          loading={saveProfileLoading}
+        />
         <Button text="Delete Account" secondary />
       </div>
     </div>

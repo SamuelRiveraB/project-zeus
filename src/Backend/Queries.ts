@@ -2,9 +2,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateEmail,
+  updatePassword,
 } from "firebase/auth";
 import { auth, db } from "./Firebase";
-import { toastErr } from "../utils/toast";
+import { toastErr, toastSucc } from "../utils/toast";
 import CatchErr from "../utils/catchErr";
 import {
   authDataType,
@@ -119,6 +121,42 @@ const updateUserInfo = async ({
       lastSeen: serverTimestamp(),
     });
   }
+};
+
+export const BE_saveProfile = async (
+  dispatch: AppDispatch,
+  data: { email: string; username: string; password: string; img: string },
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+
+  const { email, username, password, img } = data;
+  const id = getStorageUser().id;
+  if (id && auth.currentUser) {
+    if (email) {
+      updateEmail(auth.currentUser, email)
+        .then(() => {
+          toastSucc("Email updated successfully");
+        })
+        .catch((err) => CatchErr(err));
+    }
+
+    if (password) {
+      updatePassword(auth.currentUser, password)
+        .then(() => {
+          toastSucc("Password updated successfully");
+        })
+        .catch((err) => CatchErr(err));
+    }
+
+    if (username || img) {
+      await updateUserInfo({ username, img });
+      toastSucc("Profile updated successfully");
+    }
+    const userInfo = await getUserInfo(id);
+    dispatch(setUser(userInfo));
+    setLoading(false);
+  } else toastErr("BE_saveProfile: id not found");
 };
 
 export const getStorageUser = () => {

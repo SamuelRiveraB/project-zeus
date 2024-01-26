@@ -14,6 +14,8 @@ const CatchErr = (err: { code?: string }) => {
   else if (code === "auth/invalid-credential") toastErr("Invalid credentials");
   else if (code === "auth/invalid-login-credentials")
     toastErr("Invalid login credentials");
+  else if (code === "auth/operation-not-allowed")
+    toastErr("Please try again later");
   else toastErr("An error occured");
   console.log(err);
 };

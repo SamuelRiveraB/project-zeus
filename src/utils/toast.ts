@@ -7,16 +7,16 @@ export const toastErr = (msg: string, setLoading?: setLoadingType) => {
 };
 
 export const toastSucc = (msg: string, setLoading?: setLoadingType) => {
-  toast.error(msg);
+  toast.success(msg);
   if (setLoading) setLoading(false);
 };
 
 export const toastWarn = (msg: string, setLoading?: setLoadingType) => {
-  toast.error(msg);
+  toast.warn(msg);
   if (setLoading) setLoading(false);
 };
 
 export const toastInfo = (msg: string, setLoading?: setLoadingType) => {
-  toast.error(msg);
+  toast.info(msg);
   if (setLoading) setLoading(false);
 };
