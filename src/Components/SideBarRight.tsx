@@ -23,7 +23,11 @@ function SideBarRight() {
                 alt={username}
                 className="w-32 h-32 md:w-48 md:h-48 rounded-full p-[2px] ring-2 ring-gray-300 cursor-pointer hover:shadow-lg"
               />
-              <span className="absolute top-7 md:top-6 left-28 md:left-40 w-5 h-5 border-2 border-gray-800 rounded-full bg-green-400"></span>
+              <span
+                className={`absolute top-7 md:top-6 left-28 md:left-40 w-5 h-5 border-2 border-gray-800 rounded-full ${
+                  isOnline ? "bg-green-400" : "bg-gray-400"
+                }`}
+              ></span>
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-gray-400">

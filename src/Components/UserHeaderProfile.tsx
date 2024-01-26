@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import { userType } from "../Types";
 import { UserLoader } from "./Loaders";
+import truncateText from "../utils/truncateText";
 
 type Props = {
   user: userType;
@@ -71,7 +72,11 @@ const UserHeaderProfile = forwardRef(
             } ${isSelected && "text-gray-500"}`}
           >
             {otherUser
-              ? `${lastMsg ? "lastMsg" : `Last Seen: ${user.lastSeen}`}`
+              ? `${
+                  lastMsg
+                    ? truncateText(lastMsg)
+                    : `Last Seen: ${user.lastSeen}`
+                }`
               : `Joined in ${user.creationTime}`}
           </div>
         </div>

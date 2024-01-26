@@ -52,7 +52,7 @@ function ChatsProfile({ userId, chat }: Props) {
       user={user}
       otherUser
       loading={userLoading}
-      lastMsg={lastMsg}
+      lastMsg={lastMsg || "This is important, but I don't know what it is"}
       isSelected={userId === currentSelectedChat.id}
       newMsgCount={
         iCreatedChat(senderId)
