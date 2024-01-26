@@ -6,7 +6,7 @@ import UserHeaderProfile from "./UserHeaderProfile";
 import { defaultUser } from "../Redux/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../Redux/store";
-import { setCurrentSelectedChat } from "../Redux/chatsSlice";
+import { setCurrentSelectedChat, setSidebarOpen } from "../Redux/chatsSlice";
 
 type Props = { userId?: string; chat: chatType };
 
@@ -44,6 +44,7 @@ function ChatsProfile({ userId, chat }: Props) {
         senderToReceiverNewMsgCount,
       })
     );
+    dispatch(setSidebarOpen());
   };
 
   return (
