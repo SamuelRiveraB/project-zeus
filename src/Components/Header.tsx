@@ -8,7 +8,7 @@ import UserHeaderProfile from "./UserHeaderProfile";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../Redux/store";
 import { useLocation, useNavigate } from "react-router-dom";
-import { BE_signOut } from "../Backend/Queries";
+import { BE_getChats, BE_signOut } from "../Backend/Queries";
 import Spinner from "./Spinner";
 const logo = require("../Assets/logo.png");
 
@@ -26,6 +26,11 @@ function Header({}: Props) {
     else {
       goTo(`${location.pathname}`);
     }
+
+    const get = async () => {
+      await BE_getChats(dispatch);
+    };
+    get();
   }, []);
 
   const handleSignout = () => {

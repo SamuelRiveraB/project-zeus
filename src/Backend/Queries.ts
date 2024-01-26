@@ -84,32 +84,6 @@ const addUserToCollection = async (
   return getUserInfo(uid);
 };
 
-const getUserInfo = async (uid: string): Promise<userType> => {
-  const userRef = doc(db, usersColl, uid);
-  const user = await getDoc(userRef);
-  if (user.exists()) {
-    const { isOnline, img, username, email, creationTime, lastSeen, bio } =
-      user.data();
-    return {
-      id: user.id,
-      isOnline,
-      img,
-      username,
-      email,
-      creationTime: creationTime
-        ? convertTime(creationTime.toDate())
-        : "no date yet: userinfo",
-      lastSeen: lastSeen
-        ? convertTime(lastSeen.toDate())
-        : "no date yet: userinfo",
-      bio,
-    };
-  } else {
-    toastErr("getUserInfo: User not found");
-    return defaultUser;
-  }
-};
-
 const updateUserInfo = async ({
   id,
   username,
@@ -134,6 +108,40 @@ const updateUserInfo = async ({
       ...(isOffline && { isOnline: false }),
       lastSeen: serverTimestamp(),
     });
+  }
+};
+
+export const getUserInfo = async (
+  uid: string,
+  setLoading?: setLoadingType
+): Promise<userType> => {
+  if (setLoading) setLoading(true);
+  const userRef = doc(db, usersColl, uid);
+  const user = await getDoc(userRef);
+  if (user.exists()) {
+    const { isOnline, img, username, email, creationTime, lastSeen, bio } =
+      user.data();
+
+    if (setLoading) setLoading(false);
+
+    return {
+      id: user.id,
+      isOnline,
+      img,
+      username,
+      email,
+      creationTime: creationTime
+        ? convertTime(creationTime.toDate())
+        : "no date yet: userinfo",
+      lastSeen: lastSeen
+        ? convertTime(lastSeen.toDate())
+        : "no date yet: userinfo",
+      bio,
+    };
+  } else {
+    if (setLoading) setLoading(false);
+    toastErr("getUserInfo: User not found");
+    return defaultUser;
   }
 };
 
@@ -565,4 +573,9 @@ export const BE_getChats = async (dispatch: AppDispatch) => {
     });
     dispatch(setChats(chats));
   });
+};
+
+export const iCreatedChat = (senderId: string) => {
+  const myId = getStorageUser().id;
+  return myId === senderId;
 };
