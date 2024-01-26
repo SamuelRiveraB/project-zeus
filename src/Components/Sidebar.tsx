@@ -9,7 +9,7 @@ type Props = {
 function Sidebar({ children, isRight, className }: Props) {
   return (
     <div
-      className={`bg-white shadow-md border-2 overflow-scroll ${
+      className={`bg-white lg:flex-[0.3] shadow-md border-2 overflow-scroll ${
         isRight
           ? "rounded-tr-3xl rounded-br-3xl"
           : "rounded-tl-3xl rounded-bl-3xl"
