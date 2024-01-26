@@ -19,12 +19,14 @@ import {
 import { NavigateFunction } from "react-router-dom";
 import {
   addDoc,
+  and,
   collection,
   deleteDoc,
   doc,
   getDoc,
   getDocs,
   onSnapshot,
+  or,
   orderBy,
   query,
   serverTimestamp,
@@ -53,6 +55,7 @@ import {
   setTasks,
   deleteTask,
 } from "../Redux/taskListSlice";
+import { getSourceMapRange } from "typescript";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -488,3 +491,40 @@ export const getAllTasks = async (
 };
 
 // Chat
+
+export const BE_startChat = async (
+  rId: string,
+  rName: string,
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  const sId = getStorageUser().id;
+  setLoading(true);
+  const q = query(
+    collection(db, chatsColl),
+    or(
+      and(where("senderId", "==", sId), where("receiverId", "==", rId)),
+      and(where("senderId", "==", rId), where("receiverId", "==", sId))
+    )
+  );
+  const res = await getDocs(q);
+
+  if (res.empty) {
+    const newChat = await addDoc(collection(db, chatsColl), {
+      senderId: sId,
+      receiverId: rId,
+      lastMsg: "",
+      updatedAt: serverTimestamp(),
+      senderToReceiverNewMsgCount: 0,
+      receiverToSenderNewMsgCount: 0,
+    });
+    const newChatSnap = await getDoc(doc(db, newChat.path));
+    if (!newChatSnap.exists()) {
+      toastErr("BE_startChat: No such document");
+    }
+    setLoading(false);
+  } else {
+    toastErr(`You already started chatting with ${rName}`);
+    setLoading(false);
+  }
+};

@@ -1,15 +1,22 @@
 import React from "react";
 import { UsersLoader } from "./Loaders";
 import FlipMove from "react-flip-move";
-import { useSelector } from "react-redux";
-import { RootState } from "../Redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../Redux/store";
 import UserHeaderProfile from "./UserHeaderProfile";
+import { setAlertProps } from "../Redux/userSlice";
 
 type Props = { loading: boolean };
 
 function Users({ loading }: Props) {
   const users = useSelector((state: RootState) => state.user.users);
-  const handleStartChat = () => {};
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleStartChat = (r_id: string, r_name: string) => {
+    dispatch(
+      setAlertProps({ open: true, receiverId: r_id, receiverName: r_name })
+    );
+  };
   return loading ? (
     <UsersLoader />
   ) : users.length === 0 ? (
@@ -21,7 +28,7 @@ function Users({ loading }: Props) {
     <FlipMove>
       {users.map((u) => (
         <UserHeaderProfile
-          handleClick={handleStartChat}
+          handleClick={() => handleStartChat(u.id, u.username)}
           key={u.id}
           user={u}
           otherUser
