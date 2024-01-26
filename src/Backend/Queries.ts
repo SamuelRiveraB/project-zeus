@@ -24,13 +24,20 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
   updateDoc,
   where,
 } from "firebase/firestore";
-import { defaultUser, setUser, userStorageName } from "../Redux/userSlice";
+import {
+  defaultUser,
+  setUser,
+  setUsers,
+  userStorageName,
+} from "../Redux/userSlice";
 import { AppDispatch } from "../Redux/store";
 import avatarGenerator from "../utils/avatarGenerator";
 import convertTime from "../utils/convertTime";
@@ -183,6 +190,36 @@ export const BE_deleteAccount = async (
       })
       .catch((err) => CatchErr(err));
   }
+};
+
+export const BE_getAllUsers = async (
+  dispatch: AppDispatch,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const q = query(collection(db, usersColl), orderBy("isOnline", "desc"));
+  onSnapshot(q, (usersSnapshot) => {
+    let users: userType[] = [];
+    usersSnapshot.forEach((user) => {
+      const { img, isOnline, username, email, bio, creationTime, lastSeen } =
+        user.data();
+      users.push({
+        id: user.id,
+        img,
+        isOnline,
+        username,
+        email,
+        bio,
+        creationTime: convertTime(creationTime.toDate),
+        lastSeen: convertTime(lastSeen.toDate),
+      });
+    });
+    const id = getStorageUser().id;
+    if (id) {
+      dispatch(setUsers(users.filter((u) => u.id !== id)));
+    }
+    setLoading(false);
+  });
 };
 
 export const getStorageUser = () => {
@@ -449,3 +486,5 @@ export const getAllTasks = async (
   dispatch(setTasks({ listId, tasks }));
   setLoading(false);
 };
+
+// Chat

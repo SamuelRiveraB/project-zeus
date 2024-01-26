@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../Redux/store";
 import { setIsChatsTab } from "../Redux/chatsSlice";
 import Chats from "./Chats";
 import Users from "./Users";
+import { BE_getAllUsers } from "../Backend/Queries";
 
 type Props = {};
 
 function SideBarLeft({}: Props) {
   const isChatsTab = useSelector((state: RootState) => state.chat.isChatsTab);
+  const [usersLoading, setUsersLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    const get = async () => {
+      await BE_getAllUsers(dispatch, setUsersLoading);
+    };
+    get();
+  }, []);
   return (
     <Sidebar className={`flex-[0.4] w-[80%] h-[80%] md:h-full md:w-full`}>
       <div className="flex flex-col">
@@ -38,7 +47,7 @@ function SideBarLeft({}: Props) {
           </p>
         </div>
         <div className="flex-1 flex flex-col py-2 max-h-ful overflow-scroll">
-          {isChatsTab ? <Chats /> : <Users />}
+          {isChatsTab ? <Chats /> : <Users loading={usersLoading} />}
         </div>
       </div>
     </Sidebar>

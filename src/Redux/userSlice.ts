@@ -15,7 +15,7 @@ export const defaultUser: userType = {
 };
 
 const initialState = {
-  // user: [],
+  users: [],
   currentUser: defaultUser,
   // currentSelectedUser: null,
 };
@@ -29,7 +29,9 @@ const userSlice = createSlice({
       localStorage.setItem(userStorageName, JSON.stringify(user));
       state.currentUser = user;
     },
-    setUsers: (state, action) => {},
+    setUsers: (state, action) => {
+      state.users = action.payload;
+    },
   },
 });
 
