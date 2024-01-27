@@ -12,6 +12,7 @@ import CatchErr from "../utils/catchErr";
 import {
   authDataType,
   chatType,
+  messageType,
   setLoadingType,
   taskListType,
   taskType,
@@ -575,7 +576,55 @@ export const BE_getChats = async (dispatch: AppDispatch) => {
   });
 };
 
+export const BE_getMsgs = async (dispatch: AppDispatch) => {};
+
+export const BE_sendMsgs = async (
+  chatId: string,
+  data: messageType,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+  const res = await addDoc(collection(db, chatsColl, chatId, messagesColl), {
+    ...data,
+    createdAt: serverTimestamp(),
+  });
+  const newMsg = await getDoc(doc(db, res.path));
+  if (newMsg.exists()) {
+    setLoading(false);
+    await updateNewMsgCount(chatId, true);
+    await updateLastMsg(chatId, newMsg.data().content);
+    await updateUserInfo({});
+  }
+};
+
 export const iCreatedChat = (senderId: string) => {
   const myId = getStorageUser().id;
   return myId === senderId;
+};
+
+export const updateNewMsgCount = async (chatId: string, reset?: boolean) => {
+  const chat = await getDoc(doc(db, chatsColl, chatId));
+  let senderToReceiverNewMsgCount = chat.data()?.senderToReceiverNewMsgCount;
+  let receiverToSenderNewMsgCount = chat.data()?.receiverToSenderNewMsgCount;
+
+  if (iCreatedChat(chat.data()?.senderId)) {
+    if (reset) receiverToSenderNewMsgCount = 0;
+    else senderToReceiverNewMsgCount++;
+  } else {
+    if (reset) senderToReceiverNewMsgCount = 0;
+    else receiverToSenderNewMsgCount++;
+  }
+  await updateDoc(doc(db, chatsColl, chatId), {
+    updatedAt: serverTimestamp(),
+    senderToReceiverNewMsgCount,
+    receiverToSenderNewMsgCount,
+  });
+};
+
+const updateLastMsg = async (chatId: string, lastMsg: string) => {
+  await updateNewMsgCount(chatId);
+  await updateDoc(doc(db, chatsColl, chatId), {
+    lastMsg,
+    updatedAt: serverTimestamp(),
+  });
 };
