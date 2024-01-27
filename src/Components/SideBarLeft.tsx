@@ -34,7 +34,7 @@ function SideBarLeft({}: Props) {
       }`}
     >
       <div className="flex flex-col">
-        <div className="flex sticky top-0 z-10">
+        <div className="flex sticky top-0">
           <p
             onClick={() => dispatch(setIsChatsTab(true))}
             className={`p-5 flex-1 text-center font-bold cursor-pointer ${

@@ -189,7 +189,7 @@ export const BE_deleteAccount = async (
 ) => {
   setLoading(true);
   const userTaskList = await getAllTaskList();
-  if (userTaskList.length > 0) {
+  if (userTaskList && userTaskList.length > 0) {
     userTaskList.forEach((t) => {
       if (t.id && t.tasks) BE_deleteTaskList(t.id, t.tasks, dispatch);
     });
@@ -242,7 +242,7 @@ export const BE_getAllUsers = async (
 export const getStorageUser = () => {
   const usr = localStorage.getItem(userStorageName);
   if (usr) return JSON.parse(usr);
-  else return null;
+  else return "";
 };
 
 export const BE_signUp = (
@@ -398,22 +398,26 @@ export const BE_deleteTaskList = async (
 };
 
 const getAllTaskList = async () => {
-  const q = query(
-    collection(db, taskListColl),
-    where("userId", "==", getStorageUser().id)
-  );
-  const taskListSnapshot = await getDocs(q);
-  const taskList: taskListType[] = [];
-  taskListSnapshot.forEach((doc) => {
-    const { title } = doc.data();
-    taskList.push({
-      id: doc.id,
-      title,
-      editMode: false,
-      tasks: [],
+  const id = getStorageUser().id;
+
+  if (id) {
+    const q = query(
+      collection(db, taskListColl),
+      where("userId", "==", getStorageUser().id)
+    );
+    const taskListSnapshot = await getDocs(q);
+    const taskList: taskListType[] = [];
+    taskListSnapshot.forEach((doc) => {
+      const { title } = doc.data();
+      taskList.push({
+        id: doc.id,
+        title,
+        editMode: false,
+        tasks: [],
+      });
     });
-  });
-  return taskList;
+    return taskList;
+  } else toastErr("TaskList err");
 };
 
 // Tasks
@@ -569,7 +573,7 @@ export const BE_getChats = async (dispatch: AppDispatch) => {
         senderId,
         receiverId,
         lastMsg,
-        updatedAt,
+        updatedAt: updatedAt ? convertTime(updatedAt.toDate()) : "no date yet",
         receiverToSenderNewMsgCount,
         senderToReceiverNewMsgCount,
       });

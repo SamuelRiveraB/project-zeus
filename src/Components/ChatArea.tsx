@@ -64,13 +64,19 @@ function ChatArea() {
               const myId = getStorageUser().id;
               if (msg.senderId == myId) {
                 return (
-                  <div className="bg-gradient-to-r from-myBlue to-myPink text-white text-sm self-end max-w-md shadow-md py-3 px-10 rounded-t-full rounded-bl-full border-2">
+                  <div
+                    key={msg.id}
+                    className="bg-gradient-to-r from-myBlue to-myPink text-white text-sm self-end max-w-md shadow-md py-3 px-10 rounded-t-full rounded-bl-full border-2"
+                  >
                     {msg.content}
                   </div>
                 );
               } else {
                 return (
-                  <div className="bg-gray-300 text-sm self-start max-w-md shadow-md py-3 px-10 rounded-t-full rounded-br-full border-2">
+                  <div
+                    key={msg.id}
+                    className="bg-gray-300 text-sm self-start max-w-md shadow-md py-3 px-10 rounded-t-full rounded-br-full border-2"
+                  >
                     {msg.content}
                   </div>
                 );
