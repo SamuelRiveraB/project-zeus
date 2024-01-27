@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { chatType, userType } from "../Types";
+import { chatType, messageType, userType } from "../Types";
 import { defaultUser } from "./userSlice";
 
 type chatStateType = {
@@ -7,6 +7,7 @@ type chatStateType = {
   isChatsTab: boolean;
   currentSelectedChat: userType;
   sidebarOpen: boolean;
+  currentMsgs: messageType[];
 };
 
 const initialState: chatStateType = {
@@ -14,6 +15,7 @@ const initialState: chatStateType = {
   chats: [],
   currentSelectedChat: defaultUser,
   sidebarOpen: true,
+  currentMsgs: [],
 };
 
 const chatsSlice = createSlice({
@@ -33,6 +35,9 @@ const chatsSlice = createSlice({
     setSidebarOpen: (state) => {
       state.sidebarOpen = !state.sidebarOpen;
     },
+    setCurrentMsgs: (state, action) => {
+      state.currentMsgs = action.payload;
+    },
   },
 });
 
@@ -41,5 +46,6 @@ export const {
   setChats,
   setCurrentSelectedChat,
   setSidebarOpen,
+  setCurrentMsgs,
 } = chatsSlice.actions;
 export default chatsSlice.reducer;

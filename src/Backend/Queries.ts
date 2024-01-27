@@ -59,7 +59,7 @@ import {
   deleteTask,
 } from "../Redux/taskListSlice";
 import { getSourceMapRange } from "typescript";
-import { setChats } from "../Redux/chatsSlice";
+import { setChats, setCurrentMsgs } from "../Redux/chatsSlice";
 
 const usersColl = "users";
 const tasksColl = "tasks";
@@ -225,8 +225,10 @@ export const BE_getAllUsers = async (
         username,
         email,
         bio,
-        creationTime: convertTime(creationTime.toDate()),
-        lastSeen: convertTime(lastSeen.toDate()),
+        creationTime: creationTime
+          ? convertTime(creationTime.toDate())
+          : "no date yet",
+        lastSeen: lastSeen ? convertTime(lastSeen.toDate()) : "no date yet",
       });
     });
     const id = getStorageUser().id;
@@ -576,7 +578,32 @@ export const BE_getChats = async (dispatch: AppDispatch) => {
   });
 };
 
-export const BE_getMsgs = async (dispatch: AppDispatch) => {};
+export const BE_getMsgs = async (
+  dispatch: AppDispatch,
+  chatId: string,
+  setLoading: setLoadingType
+) => {
+  setLoading(true);
+
+  const q = query(
+    collection(db, chatsColl, chatId, messagesColl),
+    orderBy("createdAt", "asc")
+  );
+  onSnapshot(q, (messagesSnapshot) => {
+    let msgs: messageType[] = [];
+    messagesSnapshot.forEach((msg) => {
+      const { senderId, content, createdAt } = msg.data();
+      msgs.push({
+        id: msg.id,
+        senderId,
+        content,
+        createdAt: createdAt ? convertTime(createdAt.toDate()) : "No date yet",
+      });
+    });
+    dispatch(setCurrentMsgs(msgs));
+    setLoading(false);
+  });
+};
 
 export const BE_sendMsgs = async (
   chatId: string,
