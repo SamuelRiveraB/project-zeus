@@ -82,7 +82,7 @@ function Header({}: Props) {
 
         <div className="group relative">
           <UserHeaderProfile user={currentUser} />
-          <div className="absolute pt-5 hidden group-hover:block w-full min-w-max">
+          <div className="absolute pt-5 hidden group-hover:block w-full min-w-max z-1000">
             <ul className="w-ful bg-white overflow-hidden rounded-md shadow-md text-gray-700 pt-1">
               <li
                 onClick={() => handleGoToPage("profile")}

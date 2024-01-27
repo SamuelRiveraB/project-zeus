@@ -5,7 +5,11 @@ import { defaultUser } from "./userSlice";
 type chatStateType = {
   chats: chatType[];
   isChatsTab: boolean;
-  currentSelectedChat: userType;
+  currentSelectedChat: userType & {
+    chatId?: string;
+    senderToReceiverNewMsgCount?: number;
+    receiverToSenderNewMsgCount?: number;
+  };
   sidebarOpen: boolean;
   currentMsgs: messageType[];
 };
