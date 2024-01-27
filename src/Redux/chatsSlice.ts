@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { chatType, messageType, userType } from "../Types";
 import { defaultUser } from "./userSlice";
+import { iCreatedChat } from "../Backend/Queries";
+import { stat } from "fs";
 
 type chatStateType = {
   chats: chatType[];
@@ -12,6 +14,7 @@ type chatStateType = {
   };
   sidebarOpen: boolean;
   currentMsgs: messageType[];
+  hasNewMsg: boolean;
 };
 
 const initialState: chatStateType = {
@@ -20,6 +23,7 @@ const initialState: chatStateType = {
   currentSelectedChat: defaultUser,
   sidebarOpen: true,
   currentMsgs: [],
+  hasNewMsg: false,
 };
 
 const chatsSlice = createSlice({
@@ -29,8 +33,16 @@ const chatsSlice = createSlice({
     setIsChatsTab: (state, action) => {
       state.isChatsTab = action.payload;
     },
-    setChats: (state, action) => {
+    setChats: (state, action: { payload: chatType[] }) => {
       const chats = action.payload;
+      const newMsgCount = chats.reduce((acc, c) => {
+        if (iCreatedChat(c.senderId)) {
+          return acc + (c.receiverToSenderNewMsgCount || 0);
+        } else {
+          return acc + (c.senderToReceiverNewMsgCount || 0);
+        }
+      }, 0);
+      state.hasNewMsg = newMsgCount > 0;
       state.chats = chats;
     },
     setCurrentSelectedChat: (state, action) => {

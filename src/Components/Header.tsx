@@ -19,6 +19,7 @@ function Header({}: Props) {
   const goTo = useNavigate();
   const dispatch = useDispatch();
   const currentUser = useSelector((state: RootState) => state.user.currentUser);
+  const hasNewMsg = useSelector((state: RootState) => state.chat.hasNewMsg);
   const location = useLocation();
 
   useEffect(() => {
@@ -66,7 +67,7 @@ function Header({}: Props) {
             <Icon
               Name={BsFillChatFill}
               onClick={() => handleGoToPage("chat")}
-              ping={true}
+              ping={hasNewMsg}
             />
           </>
         ) : (
@@ -75,7 +76,7 @@ function Header({}: Props) {
             <Icon
               Name={BsFillChatFill}
               onClick={() => handleGoToPage("chat")}
-              ping={true}
+              ping={hasNewMsg}
             />
           </>
         )}

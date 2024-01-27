@@ -34,8 +34,8 @@ function Icon({
       {loading ? <Spinner /> : <Name size={size} />}
       {ping && (
         <>
-          <span className="animate-ping absolute -top-1 left-7 w-3 h-3 rounded-full bg-green-400 opacity-75"></span>
-          <span className="absolute -top-1 left-7 w-3 h-3 rounded-full bg-green-500"></span>
+          <span className="animate-ping absolute -top-1 left-7 w-3 h-3 rounded-full bg-myPink opacity-75"></span>
+          <span className="absolute -top-1 left-7 w-3 h-3 rounded-full bg-myPink"></span>
         </>
       )}
     </button>
